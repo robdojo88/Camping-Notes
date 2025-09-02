@@ -1,16 +1,3 @@
-# React + Vite
-
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
--   [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
--   [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
-
 # ================================================================
 
 CREATING A PROJECT FROM THE SCRATCH
@@ -60,7 +47,41 @@ https://console.cloud.google.com/
 > Add Authorized redirect URIs (Callback URL (for OAuth) from Supabase)
 > Save
 > Make sure to save the OAuth client created in json file to be use as your credential ini Supabase
-> =====================================================================================================
+
+====================================================
+SQL
+
+-- If extensions aren't enabled yet (Postgres 15+ usually has gen_random_uuid by default via pgcrypto)
+create extension if not exists "pgcrypto";
+
+create table if not exists tasks (
+id uuid primary key default gen_random_uuid(),
+user_id uuid references auth.users(id) on delete cascade,
+title text not null,
+is_completed boolean default false,
+created_at timestamptz default now()
+);
+
+alter table tasks enable row level security;
+
+-- Policies: users can only CRUD their own tasks
+create policy "select own tasks"
+on tasks for select
+using (auth.uid() = user_id);
+
+create policy "insert own tasks"
+on tasks for insert
+with check (auth.uid() = user_id);
+
+create policy "update own tasks"
+on tasks for update
+using (auth.uid() = user_id);
+
+create policy "delete own tasks"
+on tasks for delete
+using (auth.uid() = user_id);
+
+=====================================================================================================
 
 Abstract
 
