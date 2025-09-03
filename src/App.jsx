@@ -598,7 +598,7 @@ function App() {
                                                 }
                                                 variant='ghost'
                                                 size='sm'
-                                                className='text-red-500 hover:text-red-700 hover:bg-red-50'
+                                                className='text-red-500 hover:text-red-700 hover:bg-red-50 cursor-pointer'
                                                 disabled={
                                                     deletingTaskId === task.id
                                                 }
